@@ -5,12 +5,12 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const hre = require("hardhat");
 
-describe("Dog", function () {
+describe("Woolf", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
-  async function deployDog() {
-    const HORSE_NAME = 'dog';
+  async function deployWoolf() {
+    const WOOLF_NAME = 'woolf';
     const PLANT = 'plant';
     const NOT_FOOD = 'not-food';
     const PLASTIC = 'plastic'
@@ -21,76 +21,72 @@ describe("Dog", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.ethers.getSigners();
 
-    const DogContract = await hre.ethers.getContractFactory("Dog",  { libraries: {StringComparer: stringComparer.address}});
-    const dog = await DogContract.deploy(HORSE_NAME);
+    const WoolfContract = await hre.ethers.getContractFactory("Woolf",  { libraries: {StringComparer: stringComparer.address}});
+    const woolf = await WoolfContract.deploy(WOOLF_NAME);
     const farmerContract = await hre.ethers.getContractFactory("Farmer");
     const farmer = await farmerContract.deploy();
 
-    return { dog, farmer, owner, otherAccount, HORSE_NAME, PLANT, NOT_FOOD, PLASTIC, MEAT};
+    return { woolf, farmer, owner, otherAccount, WOOLF_NAME, PLANT, NOT_FOOD, PLASTIC, MEAT};
   }
 
-  it('Dog has the correct name. ', async function () {
-    const {dog, HORSE_NAME } = await loadFixture(deployDog);
+  it('Woolf has the correct name. ', async function () {
+    const {woolf, WOOLF_NAME } = await loadFixture(deployWoolf);
 
-    expect(await dog.getName()).to.equal(HORSE_NAME);
+    expect(await woolf.getName()).to.equal(WOOLF_NAME);
   });
 
-  it('Dog can sleep.', async function () {
-    const {dog } = await loadFixture(deployDog);
+  it('Woolf can sleep.', async function () {
+    const {woolf } = await loadFixture(deployWoolf);
 
-    expect(await dog.sleep).to.be.a('function');
+    expect(await woolf.sleep).to.be.a('function');
   });
 
-  it('Dog can eat “plant”', async function () {
-
-    const {dog, PLANT } = await loadFixture(deployDog);
-
-    expect(await dog.eat(PLANT)).not.to.be.reverted;
-  });
-
-  it('Dog cannot eat ”meat”, ”not-food”, ”plastic”.', async function () {
-    const NOT_FOOD = 'not-food';
-    const PLASTIC = 'plastic'
+  it('Woolf can eat “meat”', async function () {
     const MEAT = 'meat'
+    const {woolf } = await loadFixture(deployWoolf);
 
-    const {dog } = await loadFixture(deployDog);
+    expect(await woolf.eat(MEAT)).not.to.be.reverted;
+  });
 
-    expect(dog.eat(NOT_FOOD)).to.be.revertedWith(
+  it('Woolf cannot eat ”meat”, ”not-food”, ”plastic”.', async function () {
+    const {woolf, NOT_FOOD, PLASTIC, MEAT } = await loadFixture(deployWoolf);
+
+    expect(woolf.eat(NOT_FOOD)).to.be.revertedWith(
         "Can only eat plant food"
     );
-    expect(dog.eat(PLASTIC)).to.be.revertedWith(
+    expect(woolf.eat(PLASTIC)).to.be.revertedWith(
         "Can only eat plant food"
     );
-    expect(dog.eat(MEAT)).to.be.revertedWith(
+    expect(woolf.eat(MEAT)).to.be.revertedWith(
         "Can only eat plant food"
     );
   });
 
-  it('Farmer can call Dog, Dog responds correctly', async function () {
-    const SOUND_OF_HORSE = 'Igogo'
-    const {dog,farmer } = await loadFixture(deployDog);
+  it('Farmer can call Woolf, Woolf responds correctly', async function () {
+    const SOUND_OF_WOOLF = 'Awoo'
+    const {woolf,farmer } = await loadFixture(deployWoolf);
 
-    expect(farmer.call(dog.address)).to.be.revertedWith(
-        SOUND_OF_HORSE
+    expect(farmer.call(woolf.address)).to.be.revertedWith(
+        SOUND_OF_WOOLF
     );
   });
 
-  it('Farmer can feed Dog with plant', async function () {
-    const {dog,farmer, PLANT } = await loadFixture(deployDog);
+  it('Farmer can feed Woolf with plant', async function () {
+    const {woolf,farmer, PLANT } = await loadFixture(deployWoolf);
 
-    expect(farmer.feed(dog.address, PLANT)).not.to.be.reverted;
+    expect(farmer.feed(woolf.address, PLANT)).not.to.be.reverted;
   });
 
-  it.only('Farmer cannot feed Dog with anything else', async function () {
-    const {dog,farmer, NOT_FOOD, PLASTIC, MEAT } = await loadFixture(deployDog);
+  it('Farmer cannot feed Woolf with ”not-food”, ”plastic” and anything else', async function () {
+    const {woolf,farmer, NOT_FOOD, PLASTIC, MEAT } = await loadFixture(deployWoolf);
 
-    expect(farmer.feed(dog.address, NOT_FOOD)).to.be.revertedWith(
+    expect(farmer.feed(woolf.address, NOT_FOOD)).to.be.revertedWith(
         "Can only eat plant food"
     );
-    expect(farmer.feed(dog.address, PLASTIC)).to.be.revertedWith(
+    expect(farmer.feed(woolf.address, PLASTIC)).to.be.revertedWith(
         "Can only eat plant food"
     );
-    expect(farmer.feed(dog.address, MEAT)).to.be.revertedWith(
+    expect(farmer.feed(woolf.address, MEAT)).to.be.revertedWith(
         "Can only eat plant food"
     );
   });
